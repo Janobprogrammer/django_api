@@ -6,3 +6,6 @@ db.sqlite3
 media
 staticfiles
 .idea
+django_api.zip
+temp.py
+temp2.py
