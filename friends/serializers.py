@@ -10,3 +10,7 @@ class FriendListSerializer(serializers.ModelSerializer):
             "user",
             "friend",
         )
+
+
+class AddFriendSerializer(serializers.Serializer):
+    user_uuid = serializers.CharField(max_length=12, required=True)

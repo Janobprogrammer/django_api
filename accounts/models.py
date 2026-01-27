@@ -40,7 +40,7 @@ def generate_public_id(email: str) -> str | None:
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     uuid = models.CharField(
-        unique=True, blank=True, null=True, max_length=20,
+        unique=True, blank=True, null=True, max_length=30,
     )
 
     email = models.EmailField(unique=True)
@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
     )
 
-    phone_model = models.CharField(max_length=255, blank=True)
+    phone_model = models.CharField(max_length=255, blank=True, null=True)
 
     # --------- SOCIAL ---------
     instagram = models.URLField(blank=True)
@@ -107,7 +107,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     user_uuid = models.CharField(
         max_length=8,
         unique=True,
-        db_index=True
+        db_index=True,
+        editable=False
     )
 
     # --------- CONFIG ---------
@@ -127,8 +128,10 @@ class User(AbstractBaseUser, PermissionsMixin):
                 if not User.objects.filter(user_uuid=code).exists():
                     self.user_uuid = code
                     break
-        self.user_uuid = str(self.user_uuid).upper()
-        self.uuid = str(self.uuid).upper()
+        if self.user_uuid is not None:
+            self.user_uuid = str(self.user_uuid).upper()
+        if self.uuid is not None:
+            self.uuid = str(self.uuid).upper()
         super().save(*args, **kwargs)
 
     def __str__(self):

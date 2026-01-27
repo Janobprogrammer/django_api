@@ -11,6 +11,7 @@ load_dotenv("C:/Users/user/Desktop/django_api/.env")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
+APPEND_SLASH = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -158,9 +159,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
