@@ -1,7 +1,10 @@
 import random
+from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
+from django.core.mail import send_mail
+from config.settings import DEFAULT_FROM_EMAIL
 from .managers import UserManager
 import hashlib
 from django.conf import settings
@@ -119,6 +122,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         ordering = ["-date_joined"]
 
+    def email_user(self, subject, message, from_email=None, **kwargs):
+
+        send_mail(subject, message, from_email or DEFAULT_FROM_EMAIL, [self.email], **kwargs)
+
     def save(self, *args, **kwargs):
         if not self.user_uuid:
             for _ in range(5):
@@ -136,3 +143,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=5)

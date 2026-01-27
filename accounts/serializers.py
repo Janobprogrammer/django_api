@@ -1,7 +1,12 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework.request import Request
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from accounts.models import PasswordResetOTP
 
 User = get_user_model()
 
@@ -218,43 +223,104 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class DeviceSwapSerializer(serializers.Serializer):
-    new_uuid = serializers.CharField()
-    new_phone_model = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    uuid = serializers.CharField()
+    phone_model = serializers.CharField()
 
     def validate(self, attrs):
-        user = self.context["request"].user
+        email = attrs.get("email")
+        password = attrs.get("password")
+        new_uuid = attrs.get("uuid")
+        new_phone_model = attrs.get("phone_model")
+        print("=" * 20)
+        print(f"{email = }\n{password = }\n{new_uuid = }\n{new_phone_model = }")
+        print("=" * 20)
 
-        if not user.uuid:
-            raise serializers.ValidationError(
-                "No active device found for this user"
-            )
+        user = authenticate(email=email, password=password)
+        if not user:
+            raise serializers.ValidationError("Invalid email or password")
 
-        if attrs["new_uuid"] == user.uuid:
-            raise serializers.ValidationError(
-                "The new device cannot be the same as the current device"
-            )
+        if new_uuid == user.uuid:
+            raise serializers.ValidationError("The new device cannot be the same as the current device")
 
-        if User.objects.filter(uuid=attrs["new_uuid"]).exists():
-            raise serializers.ValidationError(
-                "This device is already linked to another account"
-            )
+        if User.objects.filter(uuid=new_uuid).exists():
+            raise serializers.ValidationError("This device is already linked to another account")
 
+        attrs["user"] = user
         return attrs
 
     def save(self):
-        user = self.context["request"].user
-        old_phone = user.phone_model
-        old_uuid = user.uuid
+        try:
+            user = self.validated_data["user"]
+            old_phone = user.phone_model
+            old_uuid = user.uuid
 
-        user.uuid = self.validated_data["new_uuid"]
-        user.phone_model = self.validated_data["new_phone_model"]
-        user.last_active = timezone.now()
-        user.save(update_fields=["uuid", "phone_model", "last_active"])
+            user.uuid = self.validated_data["uuid"]
+            user.phone_model = self.validated_data["phone_model"]
+            user.last_active = timezone.now()
+            user.save(update_fields=["uuid", "phone_model", "last_active"])
 
-        return {
-            "old_device": old_phone,
-            "new_device": user.phone_model,
-            "swapped_at": user.last_active,
-            "old_uuid": old_uuid,
-            "new_uuid": user.uuid,
-        }
+            refresh = RefreshToken.for_user(user)
+
+            return {
+                "old_device": old_phone,
+                "new_device": user.phone_model,
+                "swapped_at": user.last_active,
+                "old_uuid": old_uuid,
+                "new_uuid": user.uuid,
+
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }
+            }
+        except (Exception, ValueError) as err:
+            return {
+                "status_code": 500,
+                "response": str(err)
+            }
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, val: str):
+        if not User.objects.filter(email=val).exists():
+            raise serializers.ValidationError("User not found")
+        return val
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(email=attrs["email"])
+            otp = PasswordResetOTP.objects.get(user=user, code=attrs["code"])
+        except (User.DoesNotExist, PasswordResetOTP.DoesNotExist):
+            raise serializers.ValidationError("Invalid code or email")
+
+        if otp.is_expired():
+            otp.delete()
+            raise serializers.ValidationError("OTP expired")
+
+        attrs["user"] = user
+        attrs["otp"] = otp
+        return attrs
+
+
+class PasswordUpdateSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    new_password = serializers.CharField(max_length=32, min_length=8)
+
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(email=attrs["email"])
+            passw = attrs["new_password"]
+            user.set_password(passw)
+            user.save(update_fields=["password"])
+        except (Exception, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid email or user not found")
+        return attrs

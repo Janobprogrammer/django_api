@@ -4,6 +4,7 @@ from rest_framework_simplejwt.views import (
 )
 from .views import (
     RegisterAPIView, ProfileAPIView, CustomTokenObtainPairView, LogoutView, DeviceSwapAPIView,
+    PasswordResetConfirmAPIView, PasswordResetRequestAPIView, PasswordUpdateAPIView
 )
 
 urlpatterns = [
@@ -13,4 +14,7 @@ urlpatterns = [
     path("refresh/", TokenRefreshView.as_view()),
     path("profile/", ProfileAPIView.as_view()),
     path("device/swap/", DeviceSwapAPIView.as_view()),
+    path("password-reset/otp-request/", PasswordResetRequestAPIView.as_view()),
+    path("password-reset/otp-confirm/", PasswordResetConfirmAPIView.as_view()),
+    path("password-reset/new-password-confirm/", PasswordUpdateAPIView.as_view()),
 ]
