@@ -66,17 +66,15 @@ class SpeakingExamViewSet(ModelViewSet):
         'part2',
         'part3',
     ).prefetch_related(
-        'part1__questions__answers',
-        'part1__questions__ideas',
-        'part1__questions__vocabularies',
-
-        'part2__questions__answers',
-        'part2__questions__ideas',
-        'part2__questions__vocabularies',
-
-        'part3__questions__answers',
-        'part3__questions__ideas',
-        'part3__questions__vocabularies',
+        'part1__topic__questions__answers',
+        'part1__topic__questions__ideas',
+        'part1__topic__questions__vocabularies',
+        'part2__topic__questions__answers',
+        'part2__topic__questions__ideas',
+        'part2__topic__questions__vocabularies',
+        'part3__topic__questions__answers',
+        'part3__topic__questions__ideas',
+        'part3__topic__questions__vocabularies',
     )
 
     permission_classes = [AllowAny]

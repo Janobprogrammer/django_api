@@ -4,7 +4,7 @@ from .views import (
     SpeakingQuestionViewSet,
     SpeakingAnswerViewSet,
     SpeakingIdeaViewSet,
-    SpeakingVocabularyViewSet
+    SpeakingVocabularyViewSet, SpeakingExamViewSet
 )
 
 router = DefaultRouter()
@@ -13,5 +13,6 @@ router.register('questions', SpeakingQuestionViewSet)
 router.register('answers', SpeakingAnswerViewSet)
 router.register('ideas', SpeakingIdeaViewSet)
 router.register('vocabularies', SpeakingVocabularyViewSet)
+router.register('exam', SpeakingExamViewSet)
 
 urlpatterns = router.urls

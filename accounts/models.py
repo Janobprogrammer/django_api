@@ -41,13 +41,13 @@ def generate_public_id(email: str) -> str | None:
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, db_index=True)
     uuid = models.CharField(
-        unique=True, blank=True, null=True, max_length=30,
+        unique=True, blank=True, null=True, max_length=100, db_index=True,
     )
 
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=30, unique=True, blank=True, null=True)
+    email = models.EmailField(unique=True, db_index=True, editable=False)
+    username = models.CharField(max_length=30, unique=True, blank=True, null=True, db_index=True)
     name = models.CharField(max_length=100, blank=True)
     surname = models.CharField(max_length=100, blank=True)
 
@@ -111,7 +111,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=8,
         unique=True,
         db_index=True,
-        editable=False
+        editable=False,
     )
 
     # --------- CONFIG ---------
@@ -123,7 +123,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         ordering = ["-date_joined"]
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-
         send_mail(subject, message, from_email or DEFAULT_FROM_EMAIL, [self.email], **kwargs)
 
     def save(self, *args, **kwargs):
@@ -146,9 +145,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class PasswordResetOTP(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"EMail: {self.user}"
+
     def is_expired(self):
         return timezone.now() > self.created_at + timedelta(minutes=5)
+
+
+class PasswordResetOTPHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"EMail: {self.user}"

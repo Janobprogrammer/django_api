@@ -1,11 +1,8 @@
-from django.contrib.auth.models import AnonymousUser
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from rest_framework.request import Request
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from accounts.models import PasswordResetOTP
 
 User = get_user_model()
@@ -13,6 +10,8 @@ User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    uuid = serializers.CharField(write_only=True, required=True)
+    phone_model = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
@@ -20,17 +19,33 @@ class RegisterSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "uuid",
+            "phone_model",
             "name",
-            "surname", 
-            "username", 
-            "gender", 
-            "birthday", 
+            "surname",
+            "username",
+            "gender",
+            "birthday",
         )
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+        device_uuid = validated_data.get("uuid")
+        phone_model = validated_data.get("phone_model")
+
+        old_user = User.objects.filter(uuid=device_uuid).first()
+        if old_user:
+            old_user.uuid = None
+            old_user.phone_model = None
+            old_user.last_active = None
+            old_user.save(update_fields=["uuid", "phone_model", "last_active"])
+
         user = User(**validated_data)
         user.set_password(password)
+
+        user.last_active = timezone.now()
+        if phone_model:
+            user.phone_model = phone_model
+
         user.save()
         return user
 
@@ -162,51 +177,49 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     uuid = serializers.CharField(write_only=True, required=True)
     phone_model = serializers.CharField(write_only=True, required=False)
 
-    def validate(self, attrs: dict):
+    def validate(self, attrs):
         email = attrs.get("email")
         password = attrs.get("password")
         device_uuid = attrs.get("uuid")
         phone_model = attrs.get("phone_model")
 
         if not device_uuid:
-            raise serializers.ValidationError({
-                "uuid": "Device UUID is required"
-            })
+            raise serializers.ValidationError({"uuid": "Device UUID is required"})
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            raise serializers.ValidationError({
-                "email": "Invalid email address"
-            })
+            raise serializers.ValidationError({"email": "Invalid email address"})
 
         if not user.check_password(password):
-            raise serializers.ValidationError({
-                "password": "Invalid password"
-            })
+            raise serializers.ValidationError({"password": "Invalid password"})
 
         if not user.is_active:
             raise serializers.ValidationError("User account is not active")
 
-        if user.uuid and user.uuid != device_uuid:
-            device_name = user.phone_model or "unknown device"
-            last_login = (
-                user.last_active.isoformat()
-                if user.last_active
-                else "unknown time"
-            )
+        old_user = (
+            User.objects
+            .filter(uuid=device_uuid)
+            .exclude(id=user.id)
+            .first()
+        )
 
+        if old_user:
+            old_user.uuid = None
+            old_user.phone_model = None
+            old_user.last_active = None
+            old_user.save(update_fields=["uuid", "phone_model", "last_active"])
+
+        if user.uuid and user.uuid != device_uuid:
             raise serializers.ValidationError({
                 "detail": "This account already has an active session on another device.",
-                "phone_model": device_name,
-                "last_login": last_login,
+                "phone_model": user.phone_model or "unknown device",
+                "last_login": user.last_active.isoformat() if user.last_active else None
             })
 
         previous_login = user.last_active
 
-        if not user.uuid:
-            user.uuid = device_uuid
-
+        user.uuid = device_uuid
         if phone_model:
             user.phone_model = phone_model
 
@@ -302,6 +315,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         except (User.DoesNotExist, PasswordResetOTP.DoesNotExist):
             raise serializers.ValidationError("Invalid code or email")
 
+        if otp is None:
+            raise serializers.ValidationError("Invalid OTP code")
+
         if otp.is_expired():
             otp.delete()
             raise serializers.ValidationError("OTP expired")
@@ -324,3 +340,12 @@ class PasswordUpdateSerializer(serializers.Serializer):
         except (Exception, User.DoesNotExist):
             raise serializers.ValidationError("Invalid email or user not found")
         return attrs
+
+
+class UUIDCheckSerializer(serializers.Serializer):
+    uuid = serializers.CharField(max_length=100)
+
+    def validate_uuid(self, value):
+        if not User.objects.filter(uuid=value.upper()).exists():
+            raise serializers.ValidationError("UUID not found")
+        return value.upper()

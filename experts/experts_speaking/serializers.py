@@ -5,7 +5,7 @@ from .models import (
     Answer,
     Idea,
     Vocabulary,
-    SpeakingExam,
+    SpeakingExam, SpeakingPart,
 )
 
 
@@ -28,27 +28,30 @@ class SpeakingAnswerSerializer(serializers.ModelSerializer):
 
 
 class SpeakingQuestionSerializer(serializers.ModelSerializer):
-    answers = SpeakingAnswerSerializer(many=True)
-    ideas = SpeakingIdeaSerializer(many=True)
-    vocabularies = SpeakingVocabularySerializer(many=True)
+    answers = serializers.StringRelatedField(many=True, read_only=True)
+    ideas = serializers.StringRelatedField(many=True, read_only=True)
+    vocabularies = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = TopicQuestion
-        fields = '__all__'
+        fields = ['id', 'question', 'answers', 'ideas', 'vocabularies']
 
 
 class SpeakingTopicSerializer(serializers.ModelSerializer):
-    questions = SpeakingQuestionSerializer(many=True)
+    questions = serializers.SerializerMethodField()
 
     class Meta:
-        model = Topic
-        fields = '__all__'
+        model = SpeakingPart
+        fields = ['id', 'title', 'part', 'questions']
+
+    def get_questions(self, obj):
+        return SpeakingQuestionSerializer(obj.topic.questions.all(), many=True).data
 
 
 class SpeakingExamSerializer(serializers.ModelSerializer):
-    part1 = SpeakingTopicSerializer(many=True, read_only=True)
-    part2 = SpeakingTopicSerializer(many=True, read_only=True)
-    part3 = SpeakingTopicSerializer(many=True, read_only=True)
+    part1 = SpeakingTopicSerializer(read_only=True)
+    part2 = SpeakingTopicSerializer(read_only=True)
+    part3 = SpeakingTopicSerializer(read_only=True)
 
     class Meta:
         model = SpeakingExam
