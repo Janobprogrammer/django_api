@@ -196,10 +196,6 @@ class DeleteAccountAPIView(APIView):
                 from rest_framework_simplejwt.token_blacklist.models import (
                     OutstandingToken, BlacklistedToken
                 )
-
-                tokens = OutstandingToken.objects.filter(user=user)
-                for token in tokens:
-                    BlacklistedToken.objects.get_or_create(token=token)
             except (Exception, ValueError):
                 pass
 

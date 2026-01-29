@@ -1,51 +1,53 @@
+import hashlib
+import random
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import PasswordResetOTP
+from config import settings
 
 User = get_user_model()
 
 
+def generate_public_id(email: str) -> str | None:
+    if len(email) < 8:
+        return None
+    if "@" not in email:
+        return None
+    base = email.split("@")[0].lower()
+    salt = settings.SECRET_KEY
+    rnd = random.randint(1000, 9999)
+
+    raw = f"{base}{rnd}{salt}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:8]
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    uuid = serializers.CharField(write_only=True, required=True)
-    phone_model = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
         fields = (
-            "email",
-            "password",
-            "uuid",
-            "phone_model",
-            "name",
-            "surname",
-            "username",
-            "gender",
-            "birthday",
+            "email", "password", "uuid", "name",
+            "surname", "username", "gender", "birthday",
         )
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        device_uuid = validated_data.get("uuid")
-        phone_model = validated_data.get("phone_model")
-
-        old_user = User.objects.filter(uuid=device_uuid).first()
-        if old_user:
-            old_user.uuid = None
-            old_user.phone_model = None
-            old_user.last_active = None
-            old_user.save(update_fields=["uuid", "phone_model", "last_active"])
-
         user = User(**validated_data)
+
+        for _ in range(10):
+            code = generate_public_id(user.email)
+            if code and not User.objects.filter(user_uuid=code.upper()).exists():
+                user.user_uuid = code.upper()
+                break
+
+        if not user.user_uuid:
+            raise serializers.ValidationError("user_uuid could not be generated")
+
         user.set_password(password)
-
-        user.last_active = timezone.now()
-        if phone_model:
-            user.phone_model = phone_model
-
         user.save()
         return user
 
@@ -183,18 +185,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         device_uuid = attrs.get("uuid")
         phone_model = attrs.get("phone_model")
 
+        # print(f"Tokens: {attrs = }")
+
         if not device_uuid:
+            print(f"raise {device_uuid = }")
             raise serializers.ValidationError({"uuid": "Device UUID is required"})
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
+            print("User not found")
             raise serializers.ValidationError({"email": "Invalid email address"})
 
         if not user.check_password(password):
+            print("Wrong password")
             raise serializers.ValidationError({"password": "Invalid password"})
 
         if not user.is_active:
+            print("User is passive")
             raise serializers.ValidationError("User account is not active")
 
         old_user = (
@@ -211,6 +219,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             old_user.save(update_fields=["uuid", "phone_model", "last_active"])
 
         if user.uuid and user.uuid != device_uuid:
+            print("This account already has an active session on another device.", device_uuid)
             raise serializers.ValidationError({
                 "detail": "This account already has an active session on another device.",
                 "phone_model": user.phone_model or "unknown device",
@@ -346,6 +355,6 @@ class UUIDCheckSerializer(serializers.Serializer):
     uuid = serializers.CharField(max_length=100)
 
     def validate_uuid(self, value):
-        if not User.objects.filter(uuid=value.upper()).exists():
+        if not User.objects.filter(uuid=value).exists():
             raise serializers.ValidationError("UUID not found")
-        return value.upper()
+        return value

@@ -12,7 +12,7 @@ User = get_user_model()
 class FriendListView(viewsets.ModelViewSet):
     queryset = FriendList.objects.all()
     serializer_class = FriendListSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class AddFriendAPIView(GenericAPIView):
@@ -24,6 +24,8 @@ class AddFriendAPIView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user_uuid = request.data.get("user_uuid")
 
+        print(f"{user_uuid = }")
+
         if not user_uuid:
             return Response(
                 data={"detail": "user_uuid not found"},
@@ -31,7 +33,7 @@ class AddFriendAPIView(GenericAPIView):
             )
 
         try:
-            friend = User.objects.get(uuid=user_uuid)
+            friend = User.objects.get(user_uuid=user_uuid)
         except User.DoesNotExist:
             return Response(
                 data={"detail": "User not found"},

@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True, blank=True, null=True, max_length=100, db_index=True,
     )
 
-    email = models.EmailField(unique=True, db_index=True, editable=False)
+    email = models.EmailField(unique=True, db_index=True, editable=True)
     username = models.CharField(max_length=30, unique=True, blank=True, null=True, db_index=True)
     name = models.CharField(max_length=100, blank=True)
     surname = models.CharField(max_length=100, blank=True)
@@ -94,7 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     rating_count = models.PositiveIntegerField(default=0)
-    reward = models.PositiveIntegerField(default=5, help_text="InterCoin reward for this user added via referral.")
+    reward = models.PositiveIntegerField(default=5, help_text="InterCoin reward for this user.")
     likes = models.PositiveIntegerField(default=0, editable=False)
 
     last_active = models.DateTimeField(null=True, blank=True)
@@ -111,7 +111,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=8,
         unique=True,
         db_index=True,
-        editable=False,
+        editable=True,
     )
 
     # --------- CONFIG ---------
@@ -126,18 +126,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email or DEFAULT_FROM_EMAIL, [self.email], **kwargs)
 
     def save(self, *args, **kwargs):
-        if not self.user_uuid:
-            for _ in range(5):
-                code = generate_public_id(self.email)
-                if code is None:
-                    continue
-                if not User.objects.filter(user_uuid=code).exists():
-                    self.user_uuid = code
-                    break
-        if self.user_uuid is not None:
-            self.user_uuid = str(self.user_uuid).upper()
-        if self.uuid is not None:
-            self.uuid = str(self.uuid).upper()
+        if isinstance(self.username, str):
+            self.username = self.username.lower()
         super().save(*args, **kwargs)
 
     def __str__(self):

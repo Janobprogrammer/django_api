@@ -13,4 +13,8 @@ class FriendListSerializer(serializers.ModelSerializer):
 
 
 class AddFriendSerializer(serializers.Serializer):
-    user_uuid = serializers.CharField(max_length=12, required=True)
+    user_uuid = serializers.CharField(max_length=100, required=True)
+
+    def validate(self, attrs):
+        print(f"{attrs = }")
+        return attrs

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv("C:/Users/user/Desktop/django_api/.env")
+load_dotenv(".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     # Local apps
     "accounts.apps.AccountsConfig",
     "flashcards",
-    # "followings",
     "followings.apps.FollowingsConfig",
     "steaks",
     "ads",
@@ -74,9 +73,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-# CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 
@@ -168,6 +164,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

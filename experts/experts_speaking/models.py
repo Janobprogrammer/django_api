@@ -31,13 +31,13 @@ class SpeakingPart(models.Model):
         on_delete=models.CASCADE,
         related_name='speaking_topic'
     )
-    topic_type = models.CharField(max_length=100, choices=TOPIC_CHOICES)
+    main_question = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return f"{self.part} - {self.title}"
 
 
-class TopicQuestion(models.Model):
+class Question(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='questions')
     question = models.TextField(null=True, blank=True)
 
@@ -46,18 +46,19 @@ class TopicQuestion(models.Model):
 
 
 class Answer(models.Model):
-    question = models.ForeignKey(TopicQuestion, on_delete=models.CASCADE, related_name='answers')
+    teacher = models.ForeignKey("accounts.User", on_delete=models.CASCADE, default=None)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     text = models.TextField(null=True, blank=True)
     audio = models.FileField(upload_to='speaking/audio/', null=True, blank=True)
 
 
 class Idea(models.Model):
-    question = models.ForeignKey(TopicQuestion, on_delete=models.CASCADE, related_name='ideas')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='ideas')
     idea = models.CharField(max_length=255)
 
 
 class Vocabulary(models.Model):
-    question = models.ForeignKey(TopicQuestion, on_delete=models.CASCADE, related_name='vocabularies')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='vocabularies')
     word = models.CharField(max_length=100)
     definition = models.TextField(null=True, blank=True)
 
@@ -91,4 +92,12 @@ class SpeakingExam(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SpeakingPartName(models.Model):
+    part_name = models.ForeignKey("SpeakingPart", on_delete=models.CASCADE, related_name="part_names")
+    topic_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.topic_name
 
