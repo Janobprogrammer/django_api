@@ -17,6 +17,7 @@ class SpeakingIdeaSerializer(serializers.ModelSerializer):
 
 
 class SpeakingAnswerSerializer(serializers.ModelSerializer):
+    audio = serializers.FileField(required=False)
 
     class Meta:
         model = Answer

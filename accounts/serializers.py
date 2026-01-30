@@ -175,6 +175,57 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
+class OneUserSerializer(serializers.ModelSerializer):
+    birthday = serializers.DateField(
+        format="%d/%m/%Y",
+        input_formats=["%d/%m/%Y"],
+        required=False,
+        allow_null=True
+    )
+
+    class Meta:
+        model = User
+
+        fields = (
+            "id",
+            "uuid",
+            "username",
+            "name",
+            "surname",
+            "email",
+            "role",
+            "birthday",
+            "balance",
+            "points",
+
+            "gender",
+            "avatar",
+            "phone_model",
+            "steaks_count",
+            "likes",
+
+            # Social
+            "instagram",
+            "telegram",
+            "youtube",
+
+            # IELTS BANDS
+            "speaking_band",
+            "reading_band",
+            "listening_band",
+            "writing_band",
+
+            "rating",
+            "rating_count",
+            "reward",
+            "date_joined",
+            "premium",
+            "trf_number",
+            "trf_date",
+            "last_active",
+        )
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     uuid = serializers.CharField(write_only=True, required=True)
     phone_model = serializers.CharField(write_only=True, required=False)

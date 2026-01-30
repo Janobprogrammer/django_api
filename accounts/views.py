@@ -5,13 +5,15 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, permissions, status
 from django.contrib.auth import get_user_model, logout, update_session_auth_hash
+from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import PasswordResetOTP, PasswordResetOTPHistory
 from .serializers import (
     RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer, DeviceSwapSerializer,
-    PasswordResetRequestSerializer, PasswordResetConfirmSerializer, PasswordUpdateSerializer, UUIDCheckSerializer
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer, PasswordUpdateSerializer, UUIDCheckSerializer,
+    OneUserSerializer
 )
 from rest_framework.views import APIView
 
@@ -205,3 +207,24 @@ class DeleteAccountAPIView(APIView):
             {"detail": "Account successfully deleted"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class UserDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = OneUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return User.objects.all()
+
+
+class UserSearchAPIView(ListAPIView):
+    serializer_class = OneUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        q = self.kwargs.get("username", "").strip()
+
+        if not q:
+            return User.objects.none()
+        return User.objects.filter(username__icontains=q).order_by("username")[:10]

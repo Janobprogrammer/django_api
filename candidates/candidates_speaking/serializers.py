@@ -69,7 +69,7 @@ class PartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SpeakingPart
-        fields = ['id', 'title', 'part', 'exam_center', 'main_question', 'questions', 'part_names']
+        fields = ['id', 'title', 'part', 'main_question', 'questions', 'part_names']
 
     def get_questions(self, obj):
         qs = obj.topic.questions.all().order_by('id')
