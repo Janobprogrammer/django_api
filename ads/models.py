@@ -19,5 +19,8 @@ class InterAds(models.Model):
     views = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to="static/inter_ad_images/", null=True, blank=True)
 
+    class Meta:
+        ordering = ("id",)
+
     def __str__(self):
         return f"{self.title}"

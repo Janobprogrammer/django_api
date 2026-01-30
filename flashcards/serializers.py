@@ -1,8 +1,11 @@
 from rest_framework import serializers
+from rest_framework.parsers import MultiPartParser, FormParser
+
 from .models import FlashCard, WordList
 
 
 class WordListSerializer(serializers.ModelSerializer):
+    image = serializers.FileField(required=False)
 
     class Meta:
         model = WordList
@@ -11,6 +14,7 @@ class WordListSerializer(serializers.ModelSerializer):
             "word",
             "definition",
             "image",
+            "flash_card",
         )
 
 
@@ -20,6 +24,7 @@ class FlashCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = FlashCard
         fields = (
+            "id",
             "author",
             "title",
             "flash_type",

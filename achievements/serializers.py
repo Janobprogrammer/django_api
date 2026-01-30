@@ -9,6 +9,7 @@ class AchievementSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+
     class Meta:
         model = UserAchievement
         fields = (

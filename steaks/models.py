@@ -10,5 +10,8 @@ class Steak(models.Model):
     date = models.DateField()
     is_active = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ("id",)
+
     def __str__(self):
         return f"{self.user} -> {self.date}"

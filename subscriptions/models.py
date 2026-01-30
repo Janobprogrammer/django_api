@@ -24,5 +24,8 @@ class SubscriptionHistory(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
 
+    class Meta:
+        ordering = ("id",)
+
     def __str__(self):
         return f"{self.student} -> {self.teacher}"

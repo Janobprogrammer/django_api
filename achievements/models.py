@@ -7,5 +7,8 @@ class UserAchievement(models.Model):
     description = models.TextField()
     achieved_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ("id",)
+
     def __str__(self):
         return f"{self.user} -> {self.title}"

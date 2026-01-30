@@ -14,6 +14,7 @@ class Follow(models.Model):
     )
 
     class Meta:
+        ordering = ("id",)
         unique_together = ("follower", "following")
 
     def __str__(self):

@@ -14,6 +14,9 @@ class FriendList(models.Model):
         related_name="friends"
     )
 
+    class Meta:
+        ordering = ("id",)
+
     def clean(self):
         if self.user == self.friend:
             raise ValidationError("User cannot add himself as a friend !!!")
