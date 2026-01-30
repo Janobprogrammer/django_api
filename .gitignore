@@ -4,6 +4,7 @@ __pycache__
 *.pyc
 db.sqlite3
 media
+static
 staticfiles
 .idea
 temp2.py
