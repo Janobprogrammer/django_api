@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import UserAchievement
+from .models import Achievement, UserAchievedAt
 
 
-admin.site.register(UserAchievement)
+admin.site.register(UserAchievedAt)
+admin.site.register(Achievement)
+

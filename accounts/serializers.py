@@ -137,11 +137,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_achievements(obj):
-        return obj.userachievement_set.values(
-            "title",
-            "description",
-            "achieved_at",
-        )
+        return [
+            {
+                "id": item.achievement.id,
+                "title": item.achievement.title,
+                "achievement_type": item.achievement.achievement_type,
+                "description": item.achievement.description,
+                "max_quantity": item.achievement.max_quantity,
+                "icon": item.achievement.icon.url if item.achievement.icon else None,
+                "quantity": item.quantity,  # 👈 MANA SHU
+                "achievements_date": item.achievements_date,
+            }
+            for item in obj.achieved_user.select_related("achievement")
+        ]
 
     @staticmethod
     def get_flashcards(obj):
