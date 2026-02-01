@@ -1,10 +1,10 @@
 from django import forms
-from experts.experts_speaking.models import SpeakingPart
+from experts.experts_speaking.models import Topic
 
 
-class SpeakingPartAdminForm(forms.ModelForm):
+class TopicAdminForm(forms.ModelForm):
     class Meta:
-        model = SpeakingPart
+        model = Topic
         fields = "__all__"
 
     def clean(self):

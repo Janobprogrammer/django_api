@@ -1,5 +1,5 @@
 from django import forms
-from experts.experts_speaking.models import SpeakingPart
+from .models import SpeakingPart
 
 
 class SpeakingPartAdminForm(forms.ModelForm):

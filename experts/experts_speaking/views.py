@@ -1,18 +1,15 @@
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from .models import (
-    Topic, Question, Answer, Idea, Vocabulary, SpeakingExam,
+    Topic, Question, Answer, Idea, Vocabulary,
 )
 from .serializers import (
     SpeakingTopicSerializer,
-    SpeakingPartSerializer,
     SpeakingQuestionSerializer,
     SpeakingAnswerSerializer,
     SpeakingIdeaSerializer,
     SpeakingVocabularySerializer,
-    SpeakingExamSerializer,
-    SpeakingExamWriteSerializer,
 )
 
 
@@ -51,29 +48,26 @@ class SpeakingVocabularyViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class SpeakingExamViewSet(ModelViewSet):
-    queryset = SpeakingExam.objects.select_related(
-        'part1',
-        'part2',
-        'part3',
-    ).prefetch_related(
-        'part1__topic__questions__answers',
-        'part1__topic__questions__ideas',
-        'part1__topic__questions__vocabularies',
-
-        'part2__topic__questions__answers',
-        'part2__topic__questions__ideas',
-        'part2__topic__questions__vocabularies',
-        'part2__part_names',
-
-        'part3__topic__questions__answers',
-        'part3__topic__questions__ideas',
-        'part3__topic__questions__vocabularies',
-    )
-
+class SpeakingPart1ViewSet(ModelViewSet):
+    serializer_class = SpeakingTopicSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
-            return SpeakingExamWriteSerializer
-        return SpeakingExamSerializer
+    def get_queryset(self):
+        return Topic.objects.filter(part="part1")
+
+
+class SpeakingPart2ViewSet(ModelViewSet):
+    serializer_class = SpeakingTopicSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Topic.objects.filter(part="part2")
+
+
+class SpeakingPart3ViewSet(ModelViewSet):
+    serializer_class = SpeakingTopicSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Topic.objects.filter(part="part3")
+

@@ -53,12 +53,18 @@ INSTALLED_APPS = [
     "friends",
 
     "experts",
-    "experts.experts_speaking",
-    "experts.experts_writing",
+    "experts.part_1",
+    "experts.part_2",
+    "experts.part_3",
+    # "experts.task_1",
+    # "experts.task_2",
 
     "candidates",
-    "candidates.candidates_speaking",
-    "candidates.candidates_writing",
+    # "candidates.part_1",
+    # "candidates.part_2",
+    # "candidates.part_3",
+    # "candidates.task_1",
+    # "candidates.task_2",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -127,6 +133,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #         "NAME": "ielts_db",
 #         "USER": "postgres",
 #         "PASSWORD": "postgres",
+#         "HOST": "localhost",
+#         "PORT": "5432",
+#     }
+# }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.getenv("DB_NAME"),
+#         "USER": os.getenv("DB_USER"),
+#         "PASSWORD": os.getenv("DB_PASSWORD"),
 #         "HOST": "localhost",
 #         "PORT": "5432",
 #     }

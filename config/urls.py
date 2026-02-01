@@ -7,9 +7,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="IELTS API",
+        title="INTER IELTS API",
         default_version='v1',
-        description="Test description",
+        description="API description",
     ),
     public=True,
     url="https://themeless-constance-zoomorphic.ngrok-free.dev",
@@ -19,7 +19,6 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/accounts/", include("accounts.urls")),
-
     path("api/friends/", include("friends.urls")),
     path("api/ads/", include("ads.urls")),
     path("api/flashcards/", include("flashcards.urls")),
@@ -28,11 +27,14 @@ urlpatterns = [
     path("api/subscriptions/", include("subscriptions.urls")),
     path("api/achievements/", include("achievements.urls")),
 
-    path("api/experts-writing/", include("experts.experts_writing.urls")),
-    path("api/experts-speaking/", include("experts.experts_speaking.urls")),
+    path("api/experts-part-1/", include("experts.part_1.urls")),
+    path("api/experts-part-2/", include("experts.part_2.urls")),
+    path("api/experts-part-3/", include("experts.part_3.urls")),
+    # path("api/experts-writing/", include("experts.experts_writing.urls")),
+    # path("api/experts-speaking/", include("experts.experts_speaking.urls")),
 
-    path("api/candidates-writing/", include("candidates.candidates_writing.urls")),
-    path("api/candidates-speaking/", include("candidates.candidates_speaking.urls")),
+    # path("api/candidates-writing/", include("candidates.candidates_writing.urls")),
+    # path("api/candidates-speaking/", include("candidates.candidates_speaking.urls")),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

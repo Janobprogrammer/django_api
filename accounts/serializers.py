@@ -147,11 +147,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_flashcards(obj):
         return obj.flashcards.values(
             "id",
+            "author",
             "title",
             "flash_type",
             "description",
-            "words",
-            "image",
         )
 
     @staticmethod
