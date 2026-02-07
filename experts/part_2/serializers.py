@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Topic, Question, Answer, Idea, Vocabulary, TopicName, TopicType
+from .models import (
+    Topic, Question, Answer, Idea, Vocabulary, TopicName, TopicType,
+)
 
 
 class Part2TopicTypeSerializer(serializers.ModelSerializer):
@@ -39,13 +41,14 @@ class Part2QuestionSerializer(serializers.ModelSerializer):
     answers = serializers.SerializerMethodField()
     ideas = serializers.SerializerMethodField()
     vocabularies = serializers.SerializerMethodField()
+    audio = serializers.FileField(required=False)
 
     class Meta:
         model = Question
-        fields = ["id", "question", "answers", "ideas", "vocabularies"]
+        fields = ("id", 'topic', 'audio', "question", "answers", "ideas", "vocabularies")
 
     def get_answers(self, obj):
-        qs = obj.part_2_answers.all()
+        qs = Answer.objects.filter(question=obj.topic)
         return Part2AnswerSerializer(qs, many=True).data
 
     def get_ideas(self, obj):
@@ -56,37 +59,47 @@ class Part2QuestionSerializer(serializers.ModelSerializer):
         qs = obj.part_2_vocabularies.all()
         return Part2VocabularySerializer(qs, many=True).data
 
-
 class Part3NameSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Topic
         fields = ("id", "title")
-
 
 class Part2TopicNameSerializer(serializers.ModelSerializer):
     part3_name = Part3NameSerializer(read_only=True)
 
     class Meta:
         model = TopicName
-        fields = ["id", "part3_name"]
-
+        fields = ("id", "part3_name")
 
 class Part2TopicSerializer(serializers.ModelSerializer):
     subquestions = serializers.SerializerMethodField()
     part_names = serializers.SerializerMethodField()
+    answers = serializers.SerializerMethodField()
+    ideas = serializers.SerializerMethodField()
+    vocabularies = serializers.SerializerMethodField()
     topic_type = Part2TopicTypeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Topic
-        fields = ("id", "title", "topic_type", "question", "part_names", "always_in_use", "from_date", "to_date", "subquestions")
+        fields = (
+            "id", "title", "topic_type", "question",
+            "part_names", "always_in_use",
+            "from_date", "to_date",
+            "subquestions",
+            "answers", "ideas", "vocabularies"
+        )
 
     def get_subquestions(self, obj):
-        qs = obj.part_2_questions.all().order_by("id")
-        subquestions = list(qs.values_list("question", flat=True))
-        return subquestions
+        return list(obj.part_2_questions.values_list("question", flat=True))
 
     def get_part_names(self, obj):
-        qs = obj.part_2_names.all().order_by("id")
-        return Part2TopicNameSerializer(qs, many=True).data
+        return Part2TopicNameSerializer(obj.part_2_names.all(), many=True).data
 
+    def get_answers(self, obj):
+        return Part2AnswerSerializer(obj.part_2_answers.all(), many=True).data
+
+    def get_ideas(self, obj):
+        return Part2IdeaSerializer(obj.part_2_ideas.all(), many=True).data
+
+    def get_vocabularies(self, obj):
+        return Part2VocabularySerializer(obj.part_2_vocabularies.all(), many=True).data

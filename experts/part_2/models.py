@@ -9,6 +9,7 @@ TOPIC_CHOICES = (
     ('paid', 'Paid'),
     ('archived', 'Archived'),
     ('common', 'Common'),
+    ('not_confirmed_yet', 'Not confirmed yet'),
 )
 PART_CHOICES = (
     ('part1', 'Part 1'),
@@ -48,12 +49,13 @@ class Topic(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.question}"
 
 
 class Question(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='part_2_questions')
     question = models.TextField(null=True, blank=True)
+    audio = models.FileField(upload_to='speaking/audio/', null=True, blank=True)
 
     class Meta:
         ordering = ("id",)
@@ -64,7 +66,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     teacher = models.ForeignKey("accounts.User", on_delete=models.CASCADE, default=None, related_name='part_2_answered_teacher')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='part_2_answers')
+    question = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='part_2_answers')
     text = models.TextField(null=True, blank=True)
     audio = models.FileField(upload_to='speaking/audio/', null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -77,7 +79,7 @@ class Answer(models.Model):
 
 
 class Idea(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='part_2_ideas')
+    question = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='part_2_ideas')
     idea = models.CharField(max_length=255)
 
     class Meta:
@@ -88,7 +90,7 @@ class Idea(models.Model):
 
 
 class Vocabulary(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='part_2_vocabularies')
+    question = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='part_2_vocabularies')
     word = models.CharField(max_length=100)
     definition = models.TextField(null=True, blank=True)
 

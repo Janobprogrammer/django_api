@@ -56,15 +56,7 @@ INSTALLED_APPS = [
     "experts.part_1",
     "experts.part_2",
     "experts.part_3",
-    # "experts.task_1",
-    # "experts.task_2",
-
     "candidates",
-    # "candidates.part_1",
-    # "candidates.part_2",
-    # "candidates.part_3",
-    # "candidates.task_1",
-    # "candidates.task_2",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -127,27 +119,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "ielts_db",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "localhost",
-#         "PORT": "5432",
-#     }
-# }
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.getenv("DB_NAME"),
-#         "USER": os.getenv("DB_USER"),
-#         "PASSWORD": os.getenv("DB_PASSWORD"),
-#         "HOST": "localhost",
-#         "PORT": "5432",
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -194,3 +165,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "saidali20010209@gmail.com"
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = "saidali20010209@gmail.com"
+

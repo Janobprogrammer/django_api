@@ -48,10 +48,11 @@ class Part3QuestionSerializer(serializers.ModelSerializer):
     answers = serializers.SerializerMethodField()
     ideas = serializers.SerializerMethodField()
     vocabularies = serializers.SerializerMethodField()
+    audio = serializers.FileField(required=False)
 
     class Meta:
         model = Question
-        fields = ['id', 'question', 'answers', 'ideas', 'vocabularies']
+        fields = ['id', 'topic', 'audio', 'question', 'answers', 'ideas', 'vocabularies']
 
     def get_answers(self, obj):
         qs = obj.part_3_answers.all()

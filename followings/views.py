@@ -6,4 +6,4 @@ from .models import Follow
 class FollowingView(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowingSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]

@@ -9,20 +9,11 @@ PLAN_CHOICES = (
 
 
 class SubscriptionHistory(models.Model):
-    student = models.ForeignKey(
-        "accounts.User",
-        on_delete=models.CASCADE,
-        related_name="subscriptions"
-    )
-    teacher = models.ForeignKey(
-        "accounts.User",
-        on_delete=models.CASCADE,
-        related_name="students"
-    )
-    plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default="default")
-
-    start_date = models.DateField()
-    end_date = models.DateField()
+    student = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="subscriptions")
+    teacher = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="students")
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES, blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
 
     class Meta:
         ordering = ("id",)

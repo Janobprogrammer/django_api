@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import permissions, viewsets
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
@@ -23,8 +26,7 @@ class AddFriendAPIView(GenericAPIView):
         serializer = AddFriendSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_uuid = request.data.get("user_uuid")
-
-        print(f"{user_uuid = }")
+        user = request.user
 
         if not user_uuid:
             return Response(
@@ -40,20 +42,27 @@ class AddFriendAPIView(GenericAPIView):
                 status=404
             )
 
-        if friend == request.user:
+        if friend == user:
             return Response(
-                data={"detail": "You cannot add yourself as a friend."},
+                data={"detail": "ou cannot add yourself as a referral."},
+                status=400
+            )
+
+        now = timezone.now()
+        if now - friend.date_joined > timedelta(hours=24):
+            return Response(
+                data={"detail": "Referrals are not accepted after 24 hours from registration"},
                 status=400
             )
 
         obj, created = FriendList.objects.get_or_create(
-            user=request.user,
-            friend=friend
+            user=friend,
+            friend=user
         )
 
         if not created:
             return Response(
-                data={"detail": "This user is already on your friends list."},
+                data={"detail": "This user has already been added as your referral."},
                 status=400
             )
 

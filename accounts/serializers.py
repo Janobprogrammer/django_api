@@ -145,7 +145,7 @@ class UserSerializer(serializers.ModelSerializer):
                 "description": item.achievement.description,
                 "max_quantity": item.achievement.max_quantity,
                 "icon": item.achievement.icon.url if item.achievement.icon else None,
-                "quantity": item.quantity,  # 👈 MANA SHU
+                "quantity": item.quantity,
                 "achievements_date": item.achievements_date,
             }
             for item in obj.achieved_user.select_related("achievement")

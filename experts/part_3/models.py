@@ -10,6 +10,7 @@ TOPIC_CHOICES = (
     ('paid', 'Paid'),
     ('archived', 'Archived'),
     ('common', 'Common'),
+    ('not_confirmed_yet', 'Not confirmed yet'),
 )
 PART_CHOICES = (
     ('part1', 'Part 1'),
@@ -55,6 +56,7 @@ class Topic(models.Model):
 class Question(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='part_3_questions')
     question = models.TextField(null=True, blank=True)
+    audio = models.FileField(upload_to='speaking/audio/', null=True, blank=True)
 
     class Meta:
         ordering = ("id",)

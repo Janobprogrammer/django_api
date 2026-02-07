@@ -14,6 +14,7 @@ class Part3QuestionViewSet(ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = Part3QuestionSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
 
 class Part3AnswerViewSet(ModelViewSet):

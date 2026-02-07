@@ -1,98 +1,3 @@
-# from datetime import datetime
-# from django.utils import timezone
-# from rest_framework import serializers
-# from .models import Achievement, UserAchievedAt
-#
-#
-# class AchievementMiniSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Achievement
-#         fields = (
-#             "id",
-#             "title",
-#             "achievement_type",
-#             "description",
-#             "max_quantity",
-#             "icon",
-#         )
-#
-#
-# class AchievementSerializer(serializers.ModelSerializer):
-#     created_at = serializers.DateField(
-#         format="%d/%m/%Y",
-#         required=False,
-#         allow_null=True
-#     )
-#     icon = serializers.FileField(required=False)
-#
-#     class Meta:
-#         model = Achievement
-#         fields = (
-#             "id",
-#             "title",
-#             "achievement_type",
-#             "description",
-#             "max_quantity",
-#             "icon",
-#             "created_at",
-#         )
-#
-#
-# class UserAchievedAtSerializer(serializers.ModelSerializer):
-#     achievement = serializers.PrimaryKeyRelatedField(
-#         queryset=Achievement.objects.all()
-#     )
-#     achieved_at = serializers.ListField(
-#         child=serializers.CharField(),
-#         required=False
-#     )
-#
-#     class Meta:
-#         model = UserAchievedAt
-#         fields = (
-#             "id",
-#             "achievement",
-#             "quantity",
-#             "achievements_date",
-#         )
-#
-#     def update(self, instance, validated_data):
-#         new_date = validated_data.get("achieved_at")
-#
-#         if isinstance(new_date, str):
-#             new_date = [new_date]
-#         elif not new_date:
-#             new_date = [timezone.now().strftime("%d/%m/%Y")]
-#
-#         for date_str in new_date:
-#             try:
-#                 datetime.strptime(date_str, "%d/%m/%Y")
-#             except ValueError:
-#                 raise serializers.ValidationError({
-#                     "achieved_at": "Noto'g'ri sana formati, dd/mm/yyyy bo'lishi kerak."
-#                 })
-#
-#         if not instance.achievements_date:
-#             instance.achievements_date = []
-#
-#         instance.achievements_date.extend(new_date)
-#         instance.quantity = min(instance.quantity + 1, instance.achievement.max_quantity)
-#
-#         instance.save()
-#         return instance
-#
-#     def to_representation(self, instance):
-#         data = super().to_representation(instance)
-#         # achievement tafsilotlarini qo'shamiz
-#         data["achievement"] = AchievementSerializer(instance.achievement).data
-#
-#         # achieved_at har doim list bo'lib qaytsin
-#         if not isinstance(instance.achieved_at, list):
-#             data["achieved_at"] = [instance.achieved_at] if instance.achieved_at else []
-#         return data
-
-
-
 from rest_framework import serializers
 from .models import Achievement, UserAchievedAt
 from django.utils import timezone
@@ -131,6 +36,7 @@ class AchievementSerializer(serializers.ModelSerializer):
             "icon",
             "created_at",
         )
+
 
 class UserAchievedAtSerializer(serializers.ModelSerializer):
     achievement = serializers.PrimaryKeyRelatedField(

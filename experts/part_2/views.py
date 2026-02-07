@@ -14,9 +14,9 @@ from .serializers import (
 
 class Part2TopicViewSet(ModelViewSet):
     queryset = Topic.objects.prefetch_related(
-        'part_2_questions__part_2_answers',
-        'part_2_questions__part_2_ideas',
-        'part_2_questions__part_2_vocabularies',
+        'part_2_answers',
+        'part_2_ideas',
+        'part_2_vocabularies',
     )
     serializer_class = Part2TopicSerializer
     permission_classes = [IsAuthenticated]
@@ -26,6 +26,7 @@ class Part2QuestionViewSet(ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = Part2QuestionSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
 
 class Part2AnswerViewSet(ModelViewSet):

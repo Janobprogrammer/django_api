@@ -7,6 +7,7 @@ TYPES = (
     ("yearly", "Yearly"),
 )
 
+
 class Achievement(models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     achievement_type = models.CharField(max_length=255, choices=TYPES, blank=True, null=True)
