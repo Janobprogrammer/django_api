@@ -1,20 +1,18 @@
-from django.utils import timezone
 from rest_framework import serializers
+from accounts.serializers import FriendSerializer
 from .models import FriendList
 
 
 class FriendListSerializer(serializers.ModelSerializer):
+    friend = FriendSerializer(read_only=True)
 
     class Meta:
         model = FriendList
-        fields = (
-            "user",
-            "friend",
-        )
+        fields = ("friend",)
 
 
-class AddFriendSerializer(serializers.Serializer):
+class AddFriendListSerializer(serializers.Serializer):
     user_uuid = serializers.CharField(max_length=100, required=True)
 
-    def validate(self, attrs):
-        return attrs
+    class Meta:
+        fields = ("user_uuid",)

@@ -20,11 +20,11 @@ ALLOWED_HOSTS = ["*"]
 #     "www.interapis.uz"
 # ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://themeless-constance-zoomorphic.ngrok-free.dev",
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://themeless-constance-zoomorphic.ngrok-free.dev",
+#     "http://127.0.0.1:8000",
+#     "http://localhost:8000",
+# ]
 
 INSTALLED_APPS = [
     # Django
@@ -99,9 +99,10 @@ REST_FRAMEWORK = {
 }
 
 
-SWAGGER_SETTINGS = {
-    "DEFAULT_API_URL": "https://themeless-constance-zoomorphic.ngrok-free.dev",
-}
+# SWAGGER_SETTINGS = {
+#     # "DEFAULT_API_URL": "https://themeless-constance-zoomorphic.ngrok-free.dev",
+#     # "DEFAULT_API_URL": "https://themeless-constance-zoomorphic.ngrok-free.dev",
+# }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),

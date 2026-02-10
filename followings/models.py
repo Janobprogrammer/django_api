@@ -12,7 +12,6 @@ PLAN_CHOICES = (
 class Follow(models.Model):
     follower = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="followers")
     following = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="following")
-
     class Meta:
         ordering = ("id",)
 

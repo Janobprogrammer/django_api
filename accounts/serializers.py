@@ -124,9 +124,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_friends(obj):
-        return obj.user.values(
-            "friend",
+        friends_qs = User.objects.filter(
+            friends__user=obj
         )
+
+        return FriendSerializer(friends_qs, many=True).data
 
     @staticmethod
     def get_steaks(obj):
@@ -179,6 +181,20 @@ class UserSerializer(serializers.ModelSerializer):
             "teacher__id",
             "start_date",
             "end_date",
+        )
+
+
+class FriendSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+
+        fields = (
+            "id",
+            "name",
+            "surname",
+            "email",
+            "avatar",
         )
 
 

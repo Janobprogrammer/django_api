@@ -1,9 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import FriendListView, AddFriendAPIView
+from .views import FriendListAPIView, AddFriendAPIView
 
 router = DefaultRouter()
-router.register(r'friends', FriendListView, basename='friend')
+router.register(r'friends', FriendListAPIView, basename='friend')
 
 urlpatterns = [
     path("", include(router.urls)),

@@ -15,7 +15,7 @@ schema_view = get_schema_view(
         description="API description",
     ),
     public=True,
-    url="https://themeless-constance-zoomorphic.ngrok-free.dev",
+    # url="https://themeless-constance-zoomorphic.ngrok-free.dev",
     permission_classes=[permissions.IsAuthenticated, ],
 )
 
