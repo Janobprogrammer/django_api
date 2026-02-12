@@ -24,12 +24,18 @@ class AddFriendAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AddFriendListSerializer
 
-    def post(self, request: Request):
-        serializer = AddFriendListSerializer(data=request.data)
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user_uuid = serializer.validated_data["user_uuid"]
         user = request.user
+
+        if FriendList.objects.filter(friend=user).exists():
+            return Response(
+                {"detail": "You already added a referral before"},
+                status=400
+            )
 
         try:
             friend = User.objects.get(user_uuid=user_uuid)
@@ -39,24 +45,18 @@ class AddFriendAPIView(GenericAPIView):
         if friend == user:
             return Response({"detail": "You cannot add yourself"}, status=400)
 
-        if timezone.now() - friend.date_joined > timedelta(hours=24):
+        if timezone.now() - user.date_joined > timedelta(hours=24):
             return Response(
                 {"detail": "Referral expired after 24 hours"},
                 status=400
             )
 
-        obj, created = FriendList.objects.get_or_create(
+        FriendList.objects.create(
             user=friend,
             friend=user
         )
 
-        if not created:
-            return Response(
-                {"detail": "Already exists in friend list"},
-                status=400
-            )
-
         return Response(
-            {"detail": "User successfully added"},
+            {"detail": "Referral successfully added"},
             status=201
         )
