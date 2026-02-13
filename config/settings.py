@@ -14,22 +14,9 @@ DEBUG = False
 APPEND_SLASH = True
 
 ALLOWED_HOSTS = [
-    "*",
     "interielts.com",
-    "127.0.0.1",
-    "localhost"
+    "www.interielts.com",
 ]
-
-# ALLOWED_HOSTS = [
-#     "interapis.uz",
-#     "www.interapis.uz"
-# ]
-
-# CSRF_TRUSTED_ORIGINS = [
-#     "https://themeless-constance-zoomorphic.ngrok-free.dev",
-#     "http://127.0.0.1:8000",
-#     "http://localhost:8000",
-# ]
 
 INSTALLED_APPS = [
     # Django
@@ -61,15 +48,8 @@ INSTALLED_APPS = [
     "experts.part_1",
     "experts.part_2",
     "experts.part_3",
-    # "experts.task_1",
-    # "experts.task_2",
 
     "candidates",
-    # "candidates.part_1",
-    # "candidates.part_2",
-    # "candidates.part_3",
-    # "candidates.task_1",
-    # "candidates.task_2",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -104,10 +84,9 @@ REST_FRAMEWORK = {
 }
 
 
-# SWAGGER_SETTINGS = {
-#     # "DEFAULT_API_URL": "https://themeless-constance-zoomorphic.ngrok-free.dev",
-#     # "DEFAULT_API_URL": "https://themeless-constance-zoomorphic.ngrok-free.dev",
-# }
+SWAGGER_SETTINGS = {
+    "DEFAULT_API_URL": "https://interielts.com",
+}
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
@@ -143,13 +122,6 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT"),
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
