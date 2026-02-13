@@ -15,7 +15,7 @@ schema_view = get_schema_view(
         description="API description",
     ),
     public=True,
-    # url="https://themeless-constance-zoomorphic.ngrok-free.dev",
+    url="https://interielts.com",
     permission_classes=[permissions.IsAuthenticated, ],
 )
 
@@ -33,8 +33,6 @@ urlpatterns = [
     path("api/experts-part-1/", include("experts.part_1.urls")),
     path("api/experts-part-2/", include("experts.part_2.urls")),
     path("api/experts-part-3/", include("experts.part_3.urls")),
-    # path("api/experts-writing/", include("experts.experts_writing.urls")),
-    # path("api/experts-speaking/", include("experts.experts_speaking.urls")),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path("swagger/", csrf_exempt(schema_view.with_ui("swagger", cache_timeout=0)), name="swagger"),
