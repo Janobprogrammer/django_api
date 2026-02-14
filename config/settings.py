@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_filters",
     'drf_yasg',
+    'whitenoise',
 
     # Local apps
     "accounts.apps.AccountsConfig",
@@ -64,7 +65,7 @@ AUTH_USER_MODEL = "accounts.User"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    # "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
