@@ -16,6 +16,13 @@ APPEND_SLASH = True
 ALLOWED_HOSTS = [
     "interielts.com",
     "www.interielts.com",
+    "monkfish-app-wk6ct.ondigitalocean.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://interielts.com",
+    "https://www.interielts.com",
+    "https://monkfish-app-wk6ct.ondigitalocean.app",
 ]
 
 INSTALLED_APPS = [
